@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "name": "AFS TEST",
+  "target": {
+    "processName": "RobloxPlayerBeta.exe",
+    "titlePattern": "Roblox"
+  },
+  "safety": {
+    "countdownSeconds": 3,
+    "emergencyHotkey": "F8"
+  },
+  "nodes": [
+    {
+      "id": "start",
+      "label": "Start",
+      "position": {
+        "x": 80,
+        "y": 100
+      },
+      "type": "start"
+    },
+    {
+      "id": "stop",
+      "label": "Stop",
+      "position": {
+        "x": 380,
+        "y": 100
+      },
+      "type": "stop"
+    }
+  ],
+  "edges": [
+    {
+      "id": "start-stop",
+      "source": "start",
+      "target": "stop",
+      "outcome": "next"
+    }
+  ]
+}
