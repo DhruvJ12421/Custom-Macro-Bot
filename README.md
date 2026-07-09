@@ -4,6 +4,12 @@ Windows Macro Bot is a desktop app for building and running repeatable macros ag
 Windows application. You choose a target window, create a workflow, and let the bot perform clicks,
 key presses, delays, color checks, and OCR-based text checks in order.
 
+![Windows Macro Bot hero preview](assets/readme/hero.png)
+
+## Visual Preview
+
+![Windows Macro Bot animated preview](assets/readme/preview.gif)
+
 ## Download
 
 Download the latest installer from the GitHub Releases page and run the file named like:
@@ -21,6 +27,16 @@ Download the latest installer from the GitHub Releases page and run the file nam
 - Record input steps and reuse them in a workflow.
 - Add waits, loops, mouse actions, keyboard actions, color detection, and OCR text detection.
 - Stop a running macro at any time with `F8`.
+
+## Feature Screens
+
+### Recording Workflows
+
+![Windows Macro Bot recording workflow preview](assets/readme/recording.png)
+
+### OCR And Detection
+
+![Windows Macro Bot OCR workflow preview](assets/readme/ocr.png)
 
 ## Basic Use
 
