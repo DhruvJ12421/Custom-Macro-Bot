@@ -35,4 +35,20 @@ describe('workflow schema', () => {
         nodes: defaultWorkflow.nodes.filter((n) => n.type !== 'start'),
       }),
     ).toThrow(/one start/));
+  it('allows negative graph positions', () =>
+    expect(
+      workflowSchema.parse({
+        ...defaultWorkflow,
+        nodes: defaultWorkflow.nodes.map((node) =>
+          node.id === 'start' ? { ...node, position: { x: -120, y: -80 } } : node,
+        ),
+      }).nodes[0]?.position,
+    ).toEqual({ x: -120, y: -80 }));
+  it('accepts symbol-based emergency stop accelerators', () =>
+    expect(
+      workflowSchema.parse({
+        ...defaultWorkflow,
+        safety: { ...defaultWorkflow.safety, emergencyHotkey: 'Control+Slash' },
+      }).safety.emergencyHotkey,
+    ).toBe('Control+Slash'));
 });

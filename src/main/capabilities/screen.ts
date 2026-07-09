@@ -9,7 +9,16 @@ async function worker() {
   return ocrWorker;
 }
 
-function crop(window: WindowInfo, region: { x: number; y: number; width: number; height: number }) {
+type DetectionRegion = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  relativeTo?: 'target' | 'screen';
+};
+
+function crop(window: WindowInfo, region: DetectionRegion) {
+  if (region.relativeTo === 'screen') return region;
   if (
     region.x + region.width > window.bounds.width ||
     region.y + region.height > window.bounds.height
@@ -23,10 +32,7 @@ function crop(window: WindowInfo, region: { x: number; y: number; width: number;
   };
 }
 
-export async function captureRegion(
-  window: WindowInfo,
-  region: { x: number; y: number; width: number; height: number },
-): Promise<Buffer> {
+export async function captureRegion(window: WindowInfo, region: DetectionRegion): Promise<Buffer> {
   const image = nativeImage.createFromBuffer(await screenshot({ format: 'png' }));
   return image.crop(crop(window, region)).toPNG();
 }
@@ -52,9 +58,13 @@ export async function containsText(
   expected: string,
   confidence: number,
 ): Promise<boolean> {
-  const result = await (await worker()).recognize(png);
+  const result = await recognizeText(png);
   return (
-    result.data.confidence >= confidence &&
-    result.data.text.toLowerCase().includes(expected.toLowerCase())
+    result.confidence >= confidence && result.text.toLowerCase().includes(expected.toLowerCase())
   );
+}
+
+export async function recognizeText(png: Buffer): Promise<{ text: string; confidence: number }> {
+  const result = await (await worker()).recognize(png);
+  return { text: result.data.text.trim(), confidence: result.data.confidence };
 }

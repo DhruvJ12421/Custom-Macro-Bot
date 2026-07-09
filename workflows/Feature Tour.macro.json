@@ -1,0 +1,271 @@
+{
+  "version": 1,
+  "name": "Feature Tour",
+  "target": {
+    "processName": "electron.exe",
+    "titlePattern": "Macro Bot"
+  },
+  "safety": {
+    "countdownSeconds": 3,
+    "emergencyHotkey": "F8"
+  },
+  "nodes": [
+    {
+      "id": "start",
+      "label": "Start",
+      "position": {
+        "x": -49.726733276037706,
+        "y": 111.416253528921
+      },
+      "type": "start"
+    },
+    {
+      "id": "detect-color",
+      "label": "Check accent color",
+      "position": {
+        "x": 241.70767294710498,
+        "y": 108.85247502148584
+      },
+      "type": "detectColor",
+      "region": {
+        "x": 24,
+        "y": 73,
+        "width": 35,
+        "height": 34,
+        "relativeTo": "target"
+      },
+      "color": "#6d7df8",
+      "tolerance": 28,
+      "pollMs": 200,
+      "timeoutMs": 4000
+    },
+    {
+      "id": "wait-before-ocr",
+      "label": "Wait before OCR",
+      "position": {
+        "x": 454.84521394379715,
+        "y": 313.14207917024765
+      },
+      "type": "delay",
+      "milliseconds": 1000
+    },
+    {
+      "id": "detect-text",
+      "label": "Read button text",
+      "position": {
+        "x": 602.2905117834729,
+        "y": 92.28143543636202
+      },
+      "type": "detectText",
+      "region": {
+        "x": 68,
+        "y": 61,
+        "width": 95,
+        "height": 34
+      },
+      "text": "Macro Bot",
+      "confidence": 60,
+      "pollMs": 500,
+      "timeoutMs": 5000
+    },
+    {
+      "id": "loop-main",
+      "label": "Repeat action tour",
+      "position": {
+        "x": 913.7249180066156,
+        "y": 214.28506597520638
+      },
+      "type": "loop",
+      "maxIterations": 3,
+      "maxDurationMs": 15000
+    },
+    {
+      "id": "move-mouse",
+      "label": "Move mouse",
+      "position": {
+        "x": 1366,
+        "y": -250
+      },
+      "type": "action",
+      "kind": "move",
+      "point": {
+        "x": 120,
+        "y": 160
+      },
+      "durationMs": 250
+    },
+    {
+      "id": "mouse-down",
+      "label": "Hold mouse",
+      "position": {
+        "x": 1364,
+        "y": -150
+      },
+      "type": "action",
+      "kind": "mouseDown",
+      "point": {
+        "x": 390,
+        "y": 206
+      },
+      "durationMs": 0
+    },
+    {
+      "id": "drag-action",
+      "label": "Drag selection",
+      "position": {
+        "x": 1361.0316042302456,
+        "y": 53.153487004084596
+      },
+      "type": "action",
+      "kind": "drag",
+      "point": {
+        "x": 775,
+        "y": 496
+      },
+      "endPoint": {
+        "x": 392,
+        "y": 219
+      },
+      "durationMs": 0
+    },
+    {
+      "id": "mouse-up",
+      "label": "Release mouse",
+      "position": {
+        "x": 1363.6252833841966,
+        "y": -41.74716615803548
+      },
+      "type": "action",
+      "kind": "mouseUp",
+      "point": {
+        "x": 823,
+        "y": 461
+      },
+      "durationMs": 0
+    },
+    {
+      "id": "click-action",
+      "label": "Single click",
+      "position": {
+        "x": 1359.3717577932903,
+        "y": 168.00785850934878
+      },
+      "type": "action",
+      "kind": "click",
+      "point": {
+        "x": 1042,
+        "y": 448
+      },
+      "durationMs": 0
+    },
+    {
+      "id": "double-click-action",
+      "label": "Double click",
+      "position": {
+        "x": 1368,
+        "y": 368
+      },
+      "type": "action",
+      "kind": "doubleClick",
+      "point": {
+        "x": 420,
+        "y": 220
+      },
+      "durationMs": 0
+    },
+    {
+      "id": "scroll-action",
+      "label": "Scroll list",
+      "position": {
+        "x": 1368,
+        "y": 484
+      },
+      "type": "action",
+      "kind": "scroll",
+      "point": {
+        "x": 188,
+        "y": 705
+      },
+      "durationMs": 0,
+      "amount": 100
+    },
+    {
+      "id": "shortcut-action",
+      "label": "Send shortcut",
+      "position": {
+        "x": 1366.0000457763672,
+        "y": 598
+      },
+      "type": "action",
+      "kind": "shortcut",
+      "durationMs": 0,
+      "value": "Meta"
+    },
+    {
+      "id": "text-action",
+      "label": "Type text",
+      "position": {
+        "x": 1367.0000228881836,
+        "y": 715.9766387939453
+      },
+      "type": "action",
+      "kind": "text",
+      "durationMs": 0,
+      "value": "Sample text from the feature tour workflow"
+    },
+    {
+      "id": "stop",
+      "label": "Stop",
+      "position": {
+        "x": 1790.9467502962964,
+        "y": 238.65101140068356
+      },
+      "type": "stop"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-color-found-text",
+      "source": "detect-color",
+      "target": "detect-text",
+      "outcome": "found"
+    },
+    {
+      "id": "e-color-miss-delay",
+      "source": "detect-color",
+      "target": "wait-before-ocr",
+      "outcome": "notFound"
+    },
+    {
+      "id": "e-delay-text",
+      "source": "wait-before-ocr",
+      "target": "detect-text",
+      "outcome": "next"
+    },
+    {
+      "id": "e-text-found-loop",
+      "source": "detect-text",
+      "target": "loop-main",
+      "targetHandle": "entry",
+      "outcome": "found"
+    },
+    {
+      "id": "e-text-miss-stop",
+      "source": "detect-text",
+      "target": "stop",
+      "outcome": "notFound"
+    },
+    {
+      "id": "e-loop-done-stop",
+      "source": "loop-main",
+      "target": "stop",
+      "outcome": "done"
+    },
+    {
+      "id": "3ebfe9da-7b2a-4135-8e81-aa4a532ec3bf",
+      "source": "start",
+      "target": "detect-color",
+      "outcome": "next"
+    }
+  ]
+}

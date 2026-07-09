@@ -20,7 +20,6 @@ Coordinates and detection regions are relative to the selected target window, no
 
 - Start, action, and delay nodes use `next`.
 - Text/color detection nodes use `found` and `notFound`.
-- Branch nodes use `true` and `false`.
 - Loop nodes use `repeat` and `done` and must remain bounded.
 - Stop nodes have no outgoing route.
 
@@ -42,18 +41,12 @@ The schema validates node IDs, exactly one start node, edge references, field bo
 - Do not mechanically rewrite user workflows unless requested. `workflows/` is excluded from Prettier.
 - Explicit text actions may store user text. Recording must not reconstruct typed text automatically.
 
-## Current AFS Workflow
+## Sample Workflows
 
-`workflows/AFS Quest Compass.macro.json` is calibrated for a 1920x1080 Roblox window. It:
-
-1. Polls the Chakra quest row for `100%` every 10 seconds.
-2. Checks Durability and then Strength when Chakra is complete.
-3. Clicks the compass at window-relative `(59, 739)` for the first incomplete follow-up stat.
-4. Stops after opening the compass because destination-menu coordinates have not been captured.
-
-Recalibrate OCR regions and clicks after any Roblox resolution, UI scale, or window-chrome change. A screenshot of the opened compass menu is required before automating destination selection.
-
-Do not implement anti-cheat bypasses. Games may reject synthetic input or penalize macro use.
+`workflows/Feature Tour.macro.json` is the generic smoke-test workflow. Keep committed
+workflows app-neutral unless a user explicitly asks to save a target-specific workflow.
+Target-specific calibration files should be treated as local/user data rather than core project
+behavior.
 
 ## Development
 

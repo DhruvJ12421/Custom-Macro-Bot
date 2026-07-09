@@ -1,16 +1,27 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import ReactDOM from 'react-dom/client';
 import '@xyflow/react/dist/style.css';
 import './styles.css';
-import { App } from './App';
-import { ConnectorDebug } from './ConnectorDebug';
+
+const App = lazy(async () => {
+  const module = await import('./App');
+  return { default: module.App };
+});
+
+const ConnectorDebug = lazy(async () => {
+  const module = await import('./ConnectorDebug');
+  return { default: module.ConnectorDebug };
+});
 
 const root = ReactDOM.createRoot(document.getElementById('root')!);
+const loadingFallback = <main className="app-loading">Loading editor...</main>;
 
 if (new URLSearchParams(window.location.search).has('connector-debug')) {
   root.render(
     <React.StrictMode>
-      <ConnectorDebug />
+      <Suspense fallback={loadingFallback}>
+        <ConnectorDebug />
+      </Suspense>
     </React.StrictMode>,
   );
 } else if (!window.macroApi) {
@@ -24,7 +35,9 @@ if (new URLSearchParams(window.location.search).has('connector-debug')) {
 } else {
   root.render(
     <React.StrictMode>
-      <App />
+      <Suspense fallback={loadingFallback}>
+        <App />
+      </Suspense>
     </React.StrictMode>,
   );
 }

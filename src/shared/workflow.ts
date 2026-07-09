@@ -1,14 +1,19 @@
 import { z } from 'zod';
+import { isValidAccelerator } from './accelerators';
 
 export const pointSchema = z.object({ x: z.number().nonnegative(), y: z.number().nonnegative() });
+export const graphPointSchema = z.object({ x: z.number(), y: z.number() });
 export const regionSchema = pointSchema.extend({
   width: z.number().positive(),
   height: z.number().positive(),
 });
+export const colorRegionSchema = regionSchema.extend({
+  relativeTo: z.enum(['target', 'screen']).default('target'),
+});
 const baseNode = z.object({
   id: z.string().min(1),
   label: z.string().min(1),
-  position: pointSchema,
+  position: graphPointSchema,
 });
 const actionKind = z.enum([
   'click',
@@ -40,7 +45,7 @@ export const workflowNodeSchema = z.discriminatedUnion('type', [
   }),
   baseNode.extend({
     type: z.literal('detectColor'),
-    region: regionSchema,
+    region: colorRegionSchema,
     color: z.string().regex(/^#[0-9a-fA-F]{6}$/),
     tolerance: z.number().int().min(0).max(255),
     pollMs: z.number().int().min(50),
@@ -55,10 +60,6 @@ export const workflowNodeSchema = z.discriminatedUnion('type', [
     timeoutMs: z.number().int().min(100),
   }),
   baseNode.extend({
-    type: z.literal('branch'),
-    expression: z.enum(['lastDetectionFound', 'lastDetectionNotFound']),
-  }),
-  baseNode.extend({
     type: z.literal('loop'),
     maxIterations: z.number().int().min(1).max(10_000),
     maxDurationMs: z.number().int().min(100).max(86_400_000),
@@ -68,7 +69,8 @@ export const edgeSchema = z.object({
   id: z.string(),
   source: z.string(),
   target: z.string(),
-  outcome: z.enum(['next', 'found', 'notFound', 'true', 'false', 'repeat', 'done']).default('next'),
+  targetHandle: z.enum(['entry', 'loopBack']).optional(),
+  outcome: z.enum(['next', 'found', 'notFound', 'repeat', 'done']).default('next'),
 });
 export const workflowSchema = z
   .object({
@@ -79,7 +81,7 @@ export const workflowSchema = z
       countdownSeconds: z.number().int().min(0).max(30),
       emergencyHotkey: z
         .string()
-        .regex(/^(?:(?:Control|Alt|Shift)\+)*F(?:[1-9]|1[0-2])$/)
+        .refine(isValidAccelerator, 'Emergency stop shortcut must be a valid accelerator')
         .default('F8'),
     }),
     nodes: z.array(workflowNodeSchema).min(1),

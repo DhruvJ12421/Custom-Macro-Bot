@@ -1,4 +1,5 @@
 import { Button, Key, keyboard, mouse, Point, straightTo } from '@nut-tree-fork/nut-js';
+import { parseAccelerator } from '../../shared/accelerators';
 import type { WorkflowNode, WindowInfo } from '../../shared/workflow';
 import { relativeToScreen } from './windows';
 
@@ -9,23 +10,71 @@ const aliases: Record<string, Key> = {
   Ctrl: Key.LeftControl,
   Shift: Key.LeftShift,
   Alt: Key.LeftAlt,
+  Meta: Key.LeftMeta,
+  Win: Key.LeftWin,
+  Command: Key.LeftCmd,
+  Cmd: Key.LeftCmd,
+  Return: Key.Return,
+  ArrowUp: Key.Up,
+  ArrowDown: Key.Down,
+  ArrowLeft: Key.Left,
+  ArrowRight: Key.Right,
+  Backquote: Key.Grave,
+  '`': Key.Grave,
+  Minus: Key.Minus,
+  '-': Key.Minus,
+  Equal: Key.Equal,
+  '=': Key.Equal,
+  Plus: Key.Equal,
+  BracketLeft: Key.LeftBracket,
+  '[': Key.LeftBracket,
+  BracketRight: Key.RightBracket,
+  ']': Key.RightBracket,
+  Backslash: Key.Backslash,
+  '\\': Key.Backslash,
+  Semicolon: Key.Semicolon,
+  ';': Key.Semicolon,
+  Quote: Key.Quote,
+  "'": Key.Quote,
+  Comma: Key.Comma,
+  ',': Key.Comma,
+  Period: Key.Period,
+  '.': Key.Period,
+  Slash: Key.Slash,
+  '/': Key.Slash,
   F8: Key.F8,
 };
-const resolveKey = (name: string): Key | undefined =>
-  aliases[name] ?? (Key as unknown as Record<string, Key>)[name];
+const resolveKey = (name: string): Key | undefined => {
+  const normalized = name.trim();
+  if (/^[a-z]$/i.test(normalized))
+    return (Key as unknown as Record<string, Key>)[normalized.toUpperCase()];
+  if (/^[0-9]$/.test(normalized))
+    return (Key as unknown as Record<string, Key>)[`Num${normalized}`];
+  return aliases[normalized] ?? (Key as unknown as Record<string, Key>)[normalized];
+};
 
 async function at(win: WindowInfo, p: { x: number; y: number }) {
   const q = relativeToScreen(win, p);
   await mouse.setPosition(new Point(q.x, q.y));
 }
+
+async function standardClick(win: WindowInfo, point: { x: number; y: number }) {
+  await at(win, point);
+  await mouse.pressButton(button);
+  heldButtons.add(button);
+  await mouse.releaseButton(button);
+  heldButtons.delete(button);
+}
+
 export async function performAction(
   node: Extract<WorkflowNode, { type: 'action' }>,
   win: WindowInfo,
 ) {
-  if (node.point) await at(win, node.point);
+  if (node.point && node.kind !== 'click') await at(win, node.point);
   switch (node.kind) {
     case 'click':
-      await mouse.click(button);
+      if (!node.point) throw new Error('Click requires a location');
+      await standardClick(win, node.point);
       break;
     case 'doubleClick':
       await mouse.doubleClick(button);
@@ -47,6 +96,8 @@ export async function performAction(
       break;
     }
     case 'scroll': {
+      if (!node.point) throw new Error('Scroll requires a location');
+      await at(win, node.point);
       const amount = node.amount ?? 1;
       if (amount < 0) await mouse.scrollUp(Math.abs(amount));
       else await mouse.scrollDown(amount);
@@ -63,8 +114,7 @@ export async function performAction(
       break;
     }
     case 'shortcut': {
-      const keys = (node.value ?? '')
-        .split('+')
+      const keys = parseAccelerator(node.value ?? '')
         .map((k) => resolveKey(k.trim()))
         .filter((k): k is Key => k !== undefined);
       if (!keys.length) throw new Error('Shortcut has no supported keys');

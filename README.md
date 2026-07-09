@@ -1,6 +1,6 @@
 # Windows Macro Bot
 
-Electron and TypeScript macro editor for foreground Windows applications. It supports graph/list workflow editing, validated JSON persistence, bounded branching and loops, color/OCR detection, mouse and keyboard actions, input recording, cancellation, and an F8 emergency stop.
+Electron and TypeScript macro editor for foreground Windows applications. It supports graph/list workflow editing, validated JSON persistence, bounded loops, color/OCR detection, mouse and keyboard actions, input recording, cancellation, and an F8 emergency stop.
 
 ## Run
 
@@ -18,6 +18,19 @@ Use **Refresh** to list windows, select a foreground target, add nodes, and conn
 - The recorder stores key identities and timings, not reconstructed typed text.
 - Synthetic input can be rejected by games or elevated applications. This project does not bypass anti-cheat systems.
 - Run the bot at the same privilege level as the target application.
+
+## Manual smoke test
+
+Before considering a change ready, run through this app-level check on Windows:
+
+1. Start the app with `npm run dev`.
+2. Click **Refresh** and select a visible, foreground test window such as Notepad.
+3. Create a simple workflow: Start -> Delay -> Action -> Stop.
+4. Pick the action location from the target window and verify the stored point is relative to that window.
+5. Run the workflow and confirm the active node/log output advances to completion.
+6. Press F8 during a second run and confirm execution stops cleanly.
+7. Save the workflow, reopen it, then use **Fit nodes** and **Auto layout** to confirm the graph remains usable.
+8. For detection nodes, use the text/color debug buttons on a small target region before relying on a full run.
 
 ## Checks
 
