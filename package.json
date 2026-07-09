@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "concurrently -k \"vite\" \"tsc -p tsconfig.main.json --watch\" \"wait-on tcp:5173 dist/main/main/index.js && cross-env VITE_DEV_SERVER_URL=http://localhost:5173 electron .\"",
     "build": "npm run clean && tsc -p tsconfig.main.json && vite build",
-    "dist": "npm run build && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --win nsis",
+    "dist": "npm run build && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --win nsis --publish never",
     "start": "npm run build && electron .",
     "clean": "rimraf dist",
     "typecheck": "tsc -p tsconfig.main.json --noEmit && tsc -p tsconfig.renderer.json --noEmit",
