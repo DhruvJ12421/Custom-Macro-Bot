@@ -8,7 +8,7 @@ key presses, delays, color checks, and OCR-based text checks in order.
 
 Download the latest installer from the GitHub Releases page and run the file named like:
 
-`Windows Macro Bot-Setup-0.1.2.exe`
+`Windows Macro Bot-Setup-0.1.3.exe`
 
 - You do not need Node.js or npm to use the installed app.
 - The installer includes the app runtime and dependencies.
