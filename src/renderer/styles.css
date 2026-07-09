@@ -187,6 +187,17 @@ header {
   background: linear-gradient(145deg, #7584ff, #4959d8);
   box-shadow: 0 6px 18px #5667ee55;
 }
+.brand-mark {
+  overflow: hidden;
+  padding: 0;
+  background: linear-gradient(145deg, #0f203c, #091325);
+}
+.brand-mark img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
 .brand {
   min-width: 0;
   margin-right: 6px;

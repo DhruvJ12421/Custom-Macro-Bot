@@ -17,6 +17,7 @@ let mainWindow: BrowserWindow | undefined;
 let knownWindows = [] as ReturnType<typeof listWindows>;
 const recorder = new Recorder();
 const workflowsDirectory = path.join(app.getPath('userData'), 'workflows');
+const windowIconPath = path.join(app.getAppPath(), 'assets', 'icon.ico');
 const ensureWorkflowsDirectory = () => mkdir(workflowsDirectory, { recursive: true });
 const send = (channel: string, payload: unknown) => mainWindow?.webContents.send(channel, payload);
 const engine = new WorkflowEngine(
@@ -33,6 +34,7 @@ function createWindow() {
     minHeight: 560,
     resizable: true,
     backgroundColor: '#111827',
+    icon: windowIconPath,
     webPreferences: {
       preload: path.join(__dirname, '../preload/index.js'),
       contextIsolation: true,

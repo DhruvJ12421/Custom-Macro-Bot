@@ -33,6 +33,7 @@ import {
   type Workflow,
   type WorkflowNode,
 } from '../shared/workflow';
+import appIcon from '../../assets/icon-master.png';
 
 const palette: WorkflowNode['type'][] = [
   'action',
@@ -1410,7 +1411,9 @@ export function App() {
   return (
     <div className={`app theme-${theme} ${logsExpanded ? 'logs-expanded' : ''}`}>
       <header>
-        <div className="brand-mark">M</div>
+        <div className="brand-mark">
+          <img src={appIcon} alt="" />
+        </div>
         <div className="brand">
           <h1>Macro Bot</h1>
           <span>Workflow Studio</span>
