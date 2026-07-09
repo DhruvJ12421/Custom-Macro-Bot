@@ -65,6 +65,3 @@ npm run dist
 ```
 
 That writes the installer into `release/`.
-
-`Run Windows Macro Bot.cmd` is only for source-checkout/bootstrap use. It is not the normal end-user
-installer.
