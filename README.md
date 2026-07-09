@@ -14,7 +14,7 @@ Use **Refresh** to list windows, select a foreground target, add nodes, and conn
 ## Release installer
 
 GitHub Releases should publish a Windows installer named like
-`Windows Macro Bot-Setup-0.1.0.exe`.
+`Windows Macro Bot-Setup-0.1.1.exe`.
 
 - End users download that `.exe` from the Releases page, run it once, and launch the installed app.
 - The installer bundles Electron, Node runtime, and app dependencies up front. End users do not
