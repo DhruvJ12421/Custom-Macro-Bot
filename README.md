@@ -1,70 +1,70 @@
 # Windows Macro Bot
 
-Electron and TypeScript macro editor for foreground Windows applications. It supports graph/list workflow editing, validated JSON persistence, bounded loops, color/OCR detection, mouse and keyboard actions, input recording, cancellation, and an F8 emergency stop.
+Windows Macro Bot is a desktop app for building and running repeatable macros against a visible
+Windows application. You choose a target window, create a workflow, and let the bot perform clicks,
+key presses, delays, color checks, and OCR-based text checks in order.
 
-## Run
+## Download
+
+Download the latest installer from the GitHub Releases page and run the file named like:
+
+`Windows Macro Bot-Setup-0.1.1.exe`
+
+- You do not need Node.js or npm to use the installed app.
+- The installer includes the app runtime and dependencies.
+- The installer is currently unsigned, so Windows may show a SmartScreen warning before launch.
+
+## What You Can Do
+
+- Build macros visually with connected workflow nodes.
+- Target a specific foreground window instead of your full desktop by default.
+- Record input steps and reuse them in a workflow.
+- Add waits, loops, mouse actions, keyboard actions, color detection, and OCR text detection.
+- Stop a running macro at any time with `F8`.
+
+## Basic Use
+
+1. Open the app.
+2. Click **Refresh** and select the window you want to automate.
+3. Create or load a workflow.
+4. Configure each node.
+5. Run the workflow and watch the log/output panel for progress.
+6. Press `F8` if you need to stop the macro immediately.
+
+Saved workflows use the `*.macro.json` format.
+
+## Important Behavior
+
+- The target window must stay visible and focused while the macro runs.
+- If the window is minimized, closed, or loses focus, execution stops.
+- Coordinates for target-window actions are stored relative to that selected window.
+- Installed builds save workflow files under the app's user-data area, not inside the install
+  directory.
+
+## Safety And Limits
+
+- Test on something harmless first, such as Notepad.
+- Run the bot at the same privilege level as the target app.
+- Some games, anti-cheat systems, or elevated apps may block synthetic input.
+- OCR and color detection depend on what is actually visible on screen.
+- Input recording stores key identities and timings, not reconstructed typed sentences.
+
+## Source Build
+
+If you want to run or modify the project from source:
 
 ```powershell
 npm install
 npm run dev
 ```
 
-Use **Refresh** to list windows, select a foreground target, add nodes, and connect them in the graph. Edit node settings in the JSON inspector. Detection/action coordinates are relative to the selected window. Save files use the versioned `*.macro.json` format.
-
-## Release installer
-
-GitHub Releases should publish a Windows installer named like
-`Windows Macro Bot-Setup-0.1.1.exe`.
-
-- End users download that `.exe` from the Releases page, run it once, and launch the installed app.
-- The installer bundles Electron, Node runtime, and app dependencies up front. End users do not
-  need Node.js or npm.
-- The generated installer is unsigned by default unless you later add your own Windows code-signing
-  certificate in GitHub Actions or local release builds.
-- Packaged builds default workflow saves to the app user-data directory instead of the installed app
-  folder, which is not writable after install.
-
-Create a local installer with:
+To build a local Windows installer from source:
 
 ```powershell
 npm run dist
 ```
 
-The generated installer is written to `release/`.
+That writes the installer into `release/`.
 
-## Source checkout bootstrap
-
-`Run Windows Macro Bot.cmd` remains a source-checkout bootstrap for developers or manual zip
-downloads of the repository. It is not the GitHub Releases installer.
-
-## Safety and limitations
-
-- Keep the target visible and focused. Execution stops when it is minimized, closed, or loses focus.
-- Press F8 to stop and release held input.
-- The recorder stores key identities and timings, not reconstructed typed text.
-- Synthetic input can be rejected by games or elevated applications. This project does not bypass anti-cheat systems.
-- Run the bot at the same privilege level as the target application.
-
-## Manual smoke test
-
-Before considering a change ready, run through this app-level check on Windows:
-
-1. Start the app with `npm run dev`.
-2. Click **Refresh** and select a visible, foreground test window such as Notepad.
-3. Create a simple workflow: Start -> Delay -> Action -> Stop.
-4. Pick the action location from the target window and verify the stored point is relative to that window.
-5. Run the workflow and confirm the active node/log output advances to completion.
-6. Press F8 during a second run and confirm execution stops cleanly.
-7. Save the workflow, reopen it, then use **Fit nodes** and **Auto layout** to confirm the graph remains usable.
-8. For detection nodes, use the text/color debug buttons on a small target region before relying on a full run.
-
-## Checks
-
-```powershell
-npm run typecheck
-npm run lint
-npm run format:check
-npm test
-npm run build
-npm run dist
-```
+`Run Windows Macro Bot.cmd` is only for source-checkout/bootstrap use. It is not the normal end-user
+installer.
