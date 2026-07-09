@@ -11,7 +11,12 @@
     "typecheck": "tsc -p tsconfig.main.json --noEmit && tsc -p tsconfig.renderer.json --noEmit",
     "test": "vitest run",
     "lint": "eslint . --max-warnings=0",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check README.md package.json package-lock.json tsconfig.json tsconfig.main.json tsconfig.renderer.json vite.config.ts vitest.config.ts eslint.config.mjs \"src/**/*.{ts,tsx,css,html}\""
+  },
+  "prettier": {
+    "singleQuote": true,
+    "trailingComma": "all",
+    "printWidth": 100
   },
   "dependencies": {
     "@nut-tree-fork/nut-js": "^4.2.6",
