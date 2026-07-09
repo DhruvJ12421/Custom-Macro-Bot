@@ -11,6 +11,15 @@ npm run dev
 
 Use **Refresh** to list windows, select a foreground target, add nodes, and connect them in the graph. Edit node settings in the JSON inspector. Detection/action coordinates are relative to the selected window. Save files use the versioned `*.macro.json` format.
 
+## Bootstrap package
+
+The lightweight bootstrap package does not include `node_modules`. On first run, double-click
+`Run Windows Macro Bot.cmd`; it checks for Node.js/npm, runs `npm ci` when dependencies are
+missing, builds the app, and starts Electron.
+
+This keeps the download small, but the first run requires Node.js, npm, internet access, and enough
+time to install dependencies.
+
 ## Safety and limitations
 
 - Keep the target visible and focused. Execution stops when it is minimized, closed, or loses focus.
