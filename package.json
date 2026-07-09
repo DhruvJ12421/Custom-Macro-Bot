@@ -1,11 +1,12 @@
 {
   "name": "windows-macro-bot",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
   "main": "dist/main/main/index.js",
   "scripts": {
     "dev": "concurrently -k \"vite\" \"tsc -p tsconfig.main.json --watch\" \"wait-on tcp:5173 dist/main/main/index.js && cross-env VITE_DEV_SERVER_URL=http://localhost:5173 electron .\"",
     "build": "npm run clean && tsc -p tsconfig.main.json && vite build",
+    "dist": "npm run build && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --win nsis",
     "start": "npm run build && electron .",
     "clean": "rimraf dist",
     "typecheck": "tsc -p tsconfig.main.json --noEmit && tsc -p tsconfig.renderer.json --noEmit",
@@ -17,6 +18,51 @@
     "singleQuote": true,
     "trailingComma": "all",
     "printWidth": 100
+  },
+  "build": {
+    "appId": "com.dhruvjain.windowsmacrobot",
+    "productName": "Windows Macro Bot",
+    "artifactName": "${productName}-Setup-${version}.${ext}",
+    "asarUnpack": [
+      "node_modules/**/*.node"
+    ],
+    "files": [
+      "dist/**/*",
+      "node_modules/**/*",
+      "package.json",
+      "eng.traineddata"
+    ],
+    "extraResources": [
+      {
+        "from": "workflows",
+        "to": "workflows",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "directories": {
+      "output": "release"
+    },
+    "npmRebuild": true,
+    "win": {
+      "signAndEditExecutable": false,
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
   },
   "dependencies": {
     "@nut-tree-fork/nut-js": "^4.2.6",
@@ -39,6 +85,7 @@
     "concurrently": "^9.1.2",
     "cross-env": "^7.0.3",
     "electron": "^43.0.0",
+    "electron-builder": "^26.0.12",
     "eslint": "^9.29.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",

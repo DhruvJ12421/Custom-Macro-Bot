@@ -16,7 +16,7 @@ import { captureRegion, containsColor, recognizeText } from './capabilities/scre
 let mainWindow: BrowserWindow | undefined;
 let knownWindows = [] as ReturnType<typeof listWindows>;
 const recorder = new Recorder();
-const workflowsDirectory = path.join(app.getAppPath(), 'workflows');
+const workflowsDirectory = path.join(app.getPath('userData'), 'workflows');
 const ensureWorkflowsDirectory = () => mkdir(workflowsDirectory, { recursive: true });
 const send = (channel: string, payload: unknown) => mainWindow?.webContents.send(channel, payload);
 const engine = new WorkflowEngine(

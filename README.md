@@ -11,14 +11,31 @@ npm run dev
 
 Use **Refresh** to list windows, select a foreground target, add nodes, and connect them in the graph. Edit node settings in the JSON inspector. Detection/action coordinates are relative to the selected window. Save files use the versioned `*.macro.json` format.
 
-## Bootstrap package
+## Release installer
 
-The lightweight bootstrap package does not include `node_modules`. On first run, double-click
-`Run Windows Macro Bot.cmd`; it checks for Node.js/npm, runs `npm ci` when dependencies are
-missing, builds the app, and starts Electron.
+GitHub Releases should publish a Windows installer named like
+`Windows Macro Bot-Setup-0.1.0.exe`.
 
-This keeps the download small, but the first run requires Node.js, npm, internet access, and enough
-time to install dependencies.
+- End users download that `.exe` from the Releases page, run it once, and launch the installed app.
+- The installer bundles Electron, Node runtime, and app dependencies up front. End users do not
+  need Node.js or npm.
+- The generated installer is unsigned by default unless you later add your own Windows code-signing
+  certificate in GitHub Actions or local release builds.
+- Packaged builds default workflow saves to the app user-data directory instead of the installed app
+  folder, which is not writable after install.
+
+Create a local installer with:
+
+```powershell
+npm run dist
+```
+
+The generated installer is written to `release/`.
+
+## Source checkout bootstrap
+
+`Run Windows Macro Bot.cmd` remains a source-checkout bootstrap for developers or manual zip
+downloads of the repository. It is not the GitHub Releases installer.
 
 ## Safety and limitations
 
@@ -49,4 +66,5 @@ npm run lint
 npm run format:check
 npm test
 npm run build
+npm run dist
 ```
