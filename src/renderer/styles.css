@@ -532,22 +532,45 @@ li.active {
   margin-left: 45px;
 }
 .macro-node .node-icon {
+  display: grid;
+  place-items: center;
   width: 34px;
   height: 34px;
   border-radius: 9px;
-  font-size: 12px;
+  color: white;
 }
-.node-action .node-icon {
+.macro-node .node-icon svg,
+.inspector-heading .node-icon svg,
+.search-node-icon svg {
+  width: 18px;
+  height: 18px;
+}
+.node-start .node-icon,
+.node-icon.node-start {
+  background: linear-gradient(145deg, #42d992, #1f8f66);
+}
+.node-action .node-icon,
+.node-icon.node-action {
   background: linear-gradient(145deg, #4778ff, #3654ba);
 }
+.node-delay .node-icon,
+.node-icon.node-delay {
+  background: linear-gradient(145deg, #47d0f3, #257da8);
+}
 .node-detectColor .node-icon,
-.node-detectText .node-icon {
+.node-icon.node-detectColor {
   background: linear-gradient(145deg, #bf62e9, #7138a2);
 }
-.node-loop .node-icon {
+.node-detectText .node-icon,
+.node-icon.node-detectText {
+  background: linear-gradient(145deg, #8b7cf6, #4f46b8);
+}
+.node-loop .node-icon,
+.node-icon.node-loop {
   background: linear-gradient(145deg, #e19b38, #9c5d17);
 }
-.node-stop .node-icon {
+.node-stop .node-icon,
+.node-icon.node-stop {
   background: linear-gradient(145deg, #f45d75, #9e3043);
 }
 .node-copy {
@@ -598,15 +621,23 @@ li.active {
 .route-done {
   color: #7ee7b8;
   border-color: #2b765a;
+  background: #10261f;
 }
 .route-notFound,
 .route-false {
   color: #ff9bad;
   border-color: #7c3545;
+  background: #2a141c;
 }
 .route-repeat {
   color: #f3bd68;
   border-color: #795a29;
+  background: #2a2113;
+}
+.route-done {
+  color: #7dd3fc;
+  border-color: #2d6f91;
+  background: #102232;
 }
 .react-flow__handle {
   width: 12px;
@@ -617,6 +648,18 @@ li.active {
 }
 .route-pill .react-flow__handle {
   right: 1px;
+}
+.route-found .react-flow__handle {
+  background: var(--green);
+}
+.route-notFound .react-flow__handle {
+  background: var(--red);
+}
+.route-repeat .react-flow__handle {
+  background: #f3bd68;
+}
+.route-done .react-flow__handle {
+  background: #7dd3fc;
 }
 .react-flow__handle:hover {
   width: 16px;
@@ -648,7 +691,6 @@ li.active {
 }
 .react-flow__edge:hover .react-flow__edge-path,
 .react-flow__edge.selected .react-flow__edge-path {
-  stroke: #9da9c1;
   stroke-width: 3;
 }
 .react-flow__connection-path {
@@ -724,6 +766,16 @@ li.active {
   border-radius: 11px;
   background: #131a29;
 }
+.inspector-heading .node-icon {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  color: white;
+  background: linear-gradient(145deg, #4778ff, #3654ba);
+}
 .inspector-heading span {
   display: block;
   color: var(--muted);
@@ -776,6 +828,23 @@ li.active {
 }
 .field-help strong {
   color: #d9e0ec;
+}
+.checkbox-field {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  color: var(--text);
+  background: var(--control-bg);
+  font-size: 12px;
+  font-weight: 700;
+}
+.checkbox-field input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
 }
 fieldset {
   margin: 0;

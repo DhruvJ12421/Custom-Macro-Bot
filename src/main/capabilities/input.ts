@@ -53,13 +53,27 @@ const resolveKey = (name: string): Key | undefined => {
   return aliases[normalized] ?? (Key as unknown as Record<string, Key>)[normalized];
 };
 
+const sleep = (milliseconds: number) =>
+  new Promise<void>((resolve) => setTimeout(resolve, milliseconds));
+
 async function at(win: WindowInfo, p: { x: number; y: number }) {
   const q = relativeToScreen(win, p);
   await mouse.setPosition(new Point(q.x, q.y));
 }
 
+async function prepareRobloxClick(win: WindowInfo, point: { x: number; y: number }) {
+  const target = relativeToScreen(win, point);
+  const targetPoint = new Point(target.x, target.y);
+  await mouse.setPosition(targetPoint);
+  await sleep(150);
+  await mouse.move(straightTo(new Point(target.x + 2, target.y + 2)));
+  await sleep(20);
+  await mouse.move(straightTo(targetPoint));
+  await sleep(100);
+}
+
 async function standardClick(win: WindowInfo, point: { x: number; y: number }) {
-  await at(win, point);
+  await prepareRobloxClick(win, point);
   await mouse.pressButton(button);
   heldButtons.add(button);
   await mouse.releaseButton(button);
@@ -70,13 +84,15 @@ export async function performAction(
   node: Extract<WorkflowNode, { type: 'action' }>,
   win: WindowInfo,
 ) {
-  if (node.point && node.kind !== 'click') await at(win, node.point);
+  if (node.point && node.kind !== 'click' && node.kind !== 'doubleClick') await at(win, node.point);
   switch (node.kind) {
     case 'click':
       if (!node.point) throw new Error('Click requires a location');
       await standardClick(win, node.point);
       break;
     case 'doubleClick':
+      if (!node.point) throw new Error('Double click requires a location');
+      await prepareRobloxClick(win, node.point);
       await mouse.doubleClick(button);
       break;
     case 'move':

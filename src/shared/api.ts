@@ -52,7 +52,15 @@ export type MacroApi = {
     },
     color: string,
     tolerance: number,
-  ): Promise<{ passed: boolean; reason: string }>;
+  ): Promise<{
+    passed: boolean;
+    reason: string;
+    matchedPixels: number;
+    totalPixels: number;
+    requiredPixels: number;
+    closestColor: string;
+    bestDistance: number;
+  }>;
   startRecording(windowId: number): Promise<void>;
   stopRecording(): Promise<WorkflowNode[]>;
   openLog(logs: RunLog[]): Promise<{ path: string }>;

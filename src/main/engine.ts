@@ -56,9 +56,11 @@ export class WorkflowEngine {
           value.count++;
           loops.set(node.id, value);
           outcome =
-            value.count < node.maxIterations && Date.now() - value.started < node.maxDurationMs
+            node.infinite ||
+            (value.count < node.maxIterations && Date.now() - value.started < node.maxDurationMs)
               ? 'repeat'
               : 'done';
+          if (outcome === 'repeat') await sleep(0, signal);
           if (outcome === 'done') loops.delete(node.id);
         }
         const edge = workflow.edges.find((e) => e.source === node!.id && e.outcome === outcome);

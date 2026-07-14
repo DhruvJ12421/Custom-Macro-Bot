@@ -4,7 +4,7 @@ import { defaultWorkflow, workflowSchema } from './workflow';
 describe('workflow schema', () => {
   it('accepts the default workflow', () =>
     expect(workflowSchema.parse(defaultWorkflow)).toEqual(defaultWorkflow));
-  it('requires bounded loops', () =>
+  it('rejects invalid finite loop limits', () =>
     expect(() =>
       workflowSchema.parse({
         ...defaultWorkflow,
@@ -21,6 +21,24 @@ describe('workflow schema', () => {
         ],
       }),
     ).toThrow());
+  it('accepts infinite loops explicitly', () =>
+    expect(
+      workflowSchema.parse({
+        ...defaultWorkflow,
+        nodes: [
+          ...defaultWorkflow.nodes,
+          {
+            id: 'loop',
+            type: 'loop',
+            label: 'Loop',
+            position: { x: 0, y: 0 },
+            maxIterations: 1,
+            maxDurationMs: 100,
+            infinite: true,
+          },
+        ],
+      }).nodes[1],
+    ).toMatchObject({ type: 'loop', infinite: true }));
   it('rejects dangling edges', () =>
     expect(() =>
       workflowSchema.parse({

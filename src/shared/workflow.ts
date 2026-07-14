@@ -63,6 +63,7 @@ export const workflowNodeSchema = z.discriminatedUnion('type', [
     type: z.literal('loop'),
     maxIterations: z.number().int().min(1).max(10_000),
     maxDurationMs: z.number().int().min(100).max(86_400_000),
+    infinite: z.boolean().default(false),
   }),
 ]);
 export const edgeSchema = z.object({

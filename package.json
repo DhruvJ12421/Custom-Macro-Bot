@@ -1,6 +1,6 @@
 {
   "name": "windows-macro-bot",
-  "version": "0.1.4",
+  "version": "1.0.1",
   "private": false,
   "description": "Desktop Windows macro editor and runner for visual workflow-based automation.",
   "author": "Dhruv Jain",

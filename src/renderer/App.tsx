@@ -12,6 +12,7 @@ import {
   ConnectionLineType,
   Controls,
   Handle,
+  MarkerType,
   MiniMap,
   Panel,
   Position,
@@ -56,6 +57,14 @@ const routeLabels: Record<RouteOutcome, string> = {
   notFound: 'Not found',
   repeat: 'Repeat',
   done: 'Done',
+};
+
+const routeColors: Record<RouteOutcome, string> = {
+  next: '#7f8ca8',
+  found: '#47d9a4',
+  notFound: '#ff6f89',
+  repeat: '#f3bd68',
+  done: '#7dd3fc',
 };
 
 function outcomesFor(type: WorkflowNode['type']): RouteOutcome[] {
@@ -146,6 +155,74 @@ function useWorkflowHistory(initial: Workflow) {
   };
 }
 
+function NodeIcon({ type }: { type: WorkflowNode['type'] }) {
+  const common = {
+    width: 18,
+    height: 18,
+    viewBox: '0 0 18 18',
+    fill: 'none',
+    stroke: 'currentColor',
+    strokeWidth: 1.8,
+    strokeLinecap: 'round' as const,
+    strokeLinejoin: 'round' as const,
+    'aria-hidden': true,
+  };
+
+  switch (type) {
+    case 'start':
+      return (
+        <svg {...common}>
+          <path d="M6 4.5v9l7-4.5-7-4.5Z" fill="currentColor" stroke="none" />
+        </svg>
+      );
+    case 'action':
+      return (
+        <svg {...common}>
+          <path d="M4.5 3.5 13 8.2 9.2 9.5 7.9 13.3 4.5 3.5Z" />
+          <path d="m10.2 10.2 3.2 3.2" />
+        </svg>
+      );
+    case 'delay':
+      return (
+        <svg {...common}>
+          <circle cx="9" cy="9.5" r="5.5" />
+          <path d="M7 2.5h4" />
+          <path d="M9 6.5V10l2.3 1.4" />
+        </svg>
+      );
+    case 'detectColor':
+      return (
+        <svg {...common}>
+          <path d="m10.8 3.2 4 4-6.4 6.4a2.8 2.8 0 0 1-4-4l6.4-6.4Z" />
+          <path d="M4.8 13.2h8.5" />
+        </svg>
+      );
+    case 'detectText':
+      return (
+        <svg {...common}>
+          <path d="M4 5h10" />
+          <path d="M9 5v9" />
+          <path d="M6.5 14h5" />
+        </svg>
+      );
+    case 'loop':
+      return (
+        <svg {...common}>
+          <path d="M13.5 6.5A5 5 0 0 0 4.4 5.1L3 6.7" />
+          <path d="M3 3.5v3.2h3.2" />
+          <path d="M4.5 11.5a5 5 0 0 0 9.1 1.4l1.4-1.6" />
+          <path d="M15 14.5v-3.2h-3.2" />
+        </svg>
+      );
+    case 'stop':
+      return (
+        <svg {...common}>
+          <rect x="4.5" y="4.5" width="9" height="9" rx="1.5" fill="currentColor" stroke="none" />
+        </svg>
+      );
+  }
+}
+
 const MacroNode = memo(function MacroNode({ data, selected }: NodeProps<MacroFlowNode>) {
   return (
     <div className={`macro-node node-${data.nodeType} ${selected ? 'selected' : ''}`}>
@@ -163,7 +240,9 @@ const MacroNode = memo(function MacroNode({ data, selected }: NodeProps<MacroFlo
       ) : data.nodeType !== 'start' ? (
         <Handle type="target" position={Position.Left} />
       ) : null}
-      <div className="node-icon">{data.nodeType.slice(0, 1).toUpperCase()}</div>
+      <div className="node-icon">
+        <NodeIcon type={data.nodeType} />
+      </div>
       <div className="node-copy">
         <span className="macro-node-type">{data.nodeType}</span>
         <strong>{data.label}</strong>
@@ -190,7 +269,7 @@ const nodeTypes: NodeTypes = { macro: MacroNode };
 function Icon({
   name,
 }: {
-  name: 'refresh' | 'undo' | 'redo' | 'play' | 'stop' | 'settings' | 'close';
+  name: 'refresh' | 'undo' | 'redo' | 'play' | 'stop' | 'settings' | 'close' | 'open' | 'save';
 }) {
   const common = {
     width: 16,
@@ -224,6 +303,21 @@ function Icon({
         <svg {...common}>
           <path d="m10 4 3.5 3.5L10 11" />
           <path d="M13 7.5H6.75a4.25 4.25 0 1 0 0 8.5h.75" />
+        </svg>
+      );
+    case 'open':
+      return (
+        <svg {...common}>
+          <path d="M2.8 5.2h4l1.1 1.4h5.3v6.6H2.8V5.2Z" />
+          <path d="M4 5.2V3.5h3.1l1.1 1.2h3.8v1.9" />
+        </svg>
+      );
+    case 'save':
+      return (
+        <svg {...common}>
+          <path d="M3.2 2.8h8.5l1.1 1.1v9.3H3.2V2.8Z" />
+          <path d="M5.2 2.8v4h5.4v-4" />
+          <path d="M5.4 13.2V9.5h5.2v3.7" />
         </svg>
       );
     case 'play':
@@ -291,6 +385,7 @@ function normalizeWorkflow(workflow: Workflow): Workflow {
           ...node,
           region: { ...node.region, relativeTo: node.region.relativeTo ?? 'target' },
         };
+      if (node.type === 'loop') return { ...node, infinite: node.infinite ?? false };
       return node;
     }),
   });
@@ -329,7 +424,7 @@ function makeNode(type: WorkflowNode['type'], index: number): WorkflowNode {
         timeoutMs: 5000,
       };
     case 'loop':
-      return { ...base, type, maxIterations: 11, maxDurationMs: 60_000 };
+      return { ...base, type, maxIterations: 11, maxDurationMs: 60_000, infinite: false };
     case 'stop':
       return { ...base, type };
     case 'start':
@@ -365,6 +460,11 @@ type TextDebugResult = {
 type ColorDebugResult = {
   passed: boolean;
   reason: string;
+  matchedPixels: number;
+  totalPixels: number;
+  requiredPixels: number;
+  closestColor: string;
+  bestDistance: number;
 };
 type ThemeName = 'midnight' | 'graphite' | 'slate' | 'light';
 
@@ -528,7 +628,9 @@ const NodeInspector = memo(function NodeInspector({
   return (
     <div className="inspector-form">
       <div className="inspector-heading">
-        <div className="node-icon">{node.type.slice(0, 1).toUpperCase()}</div>
+        <div className={`node-icon node-${node.type}`}>
+          <NodeIcon type={node.type} />
+        </div>
         <div>
           <span>{node.type}</span>
           <strong>{node.label}</strong>
@@ -689,13 +791,15 @@ const NodeInspector = memo(function NodeInspector({
             onChange={(tolerance) => patch({ tolerance })}
           />
           <button className="debug-text wide" disabled={debuggingColor} onClick={onDebugColor}>
-            {debuggingColor ? 'Checking color…' : 'Test color tolerance now'}
+            {debuggingColor ? 'Checking color...' : 'Test color tolerance now'}
           </button>
           {colorDebug && (
             <div className={`text-debug-result ${colorDebug.passed ? 'passed' : 'failed'}`}>
               <div>
                 <strong>{colorDebug.passed ? 'Passed' : 'Failed'}</strong>
-                <span>{node.tolerance} tolerance</span>
+                <span>
+                  {colorDebug.matchedPixels}/{colorDebug.totalPixels} pixels
+                </span>
               </div>
               <p>{colorDebug.reason}</p>
             </div>
@@ -715,7 +819,7 @@ const NodeInspector = memo(function NodeInspector({
             onChange={(confidence) => patch({ confidence })}
           />
           <button className="debug-text wide" disabled={debuggingText} onClick={onDebugText}>
-            {debuggingText ? 'Running OCR…' : 'Debug detection now'}
+            {debuggingText ? 'Running OCR...' : 'Debug detection now'}
           </button>
           {textDebug && (
             <div className={`text-debug-result ${textDebug.passed ? 'passed' : 'failed'}`}>
@@ -747,6 +851,14 @@ const NodeInspector = memo(function NodeInspector({
       )}
       {node.type === 'loop' && (
         <>
+          <label className="checkbox-field">
+            <input
+              type="checkbox"
+              checked={node.infinite}
+              onChange={(event) => patch({ infinite: event.target.checked })}
+            />
+            <span>Loop forever until stopped</span>
+          </label>
           <NumberField
             label="Number of loops"
             value={Math.max(0, node.maxIterations - 1)}
@@ -756,8 +868,10 @@ const NodeInspector = memo(function NodeInspector({
           />
           <p className="field-help">
             Connect <strong>Repeat</strong> through the loop body, then return it to{' '}
-            <strong>Loop back</strong>. After this many repeats, <strong>Done</strong> continues the
-            workflow.
+            <strong>Loop back</strong>.{' '}
+            {node.infinite
+              ? 'When infinite looping is enabled, Repeat keeps running until you stop the workflow.'
+              : 'After this many repeats, Done continues the workflow.'}
           </p>
           <NumberField
             label="Maximum duration (ms)"
@@ -866,6 +980,7 @@ export function App() {
     () =>
       workflow.edges.map((edge) => {
         const targetHandle = loopTargetHandle(workflow, edge);
+        const color = routeColors[edge.outcome];
         return {
           id: edge.id,
           source: edge.source,
@@ -877,7 +992,8 @@ export function App() {
           type: 'step',
           zIndex: 5,
           interactionWidth: 24,
-          style: { stroke: '#7f8ca8', strokeWidth: 2.4 },
+          style: { stroke: color, strokeWidth: 2.4 },
+          markerEnd: { type: MarkerType.ArrowClosed, color },
         };
       }),
     [workflow, selectedEdge],
@@ -1438,10 +1554,10 @@ export function App() {
           <Icon name="refresh" />
         </button>
         <button title="Open workflow (Ctrl+O)" onClick={() => void load()}>
-          Open
+          <Icon name="open" /> Open
         </button>
         <button title="Save workflow (Ctrl+S)" onClick={() => void save()}>
-          Save
+          <Icon name="save" /> Save
         </button>
         <button
           className="icon-button"
@@ -1681,8 +1797,8 @@ export function App() {
                   .filter((type) => type.toLowerCase().includes(connectionMenu.query.toLowerCase()))
                   .map((type) => (
                     <button key={type} onClick={() => createConnectedNode(type)}>
-                      <span className={`search-node-icon node-${type}`}>
-                        {type[0]!.toUpperCase()}
+                      <span className={`search-node-icon node-icon node-${type}`}>
+                        <NodeIcon type={type} />
                       </span>
                       <span>
                         <strong>{type.replace(/([A-Z])/g, ' $1')}</strong>

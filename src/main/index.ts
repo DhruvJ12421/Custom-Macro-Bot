@@ -11,7 +11,7 @@ import {
 } from './capabilities/windows';
 import { Recorder } from './recorder';
 import { pickPoint, pickRegion, pickScreenRegion, preparePicker } from './regionPicker';
-import { captureRegion, containsColor, recognizeText } from './capabilities/screen';
+import { analyzeColor, captureRegion, recognizeText } from './capabilities/screen';
 
 let mainWindow: BrowserWindow | undefined;
 let knownWindows = [] as ReturnType<typeof listWindows>;
@@ -140,8 +140,8 @@ app.whenReady().then(() => {
   ipcMain.handle('cursor:relative', async (_event, id: number) => {
     const win = knownWindows.find((item) => item.id === id);
     if (!win) throw new Error('Selected window is unavailable');
-    const focused = await focusSelectedWindow(win);
-    return getRelativeCursorPosition(focused);
+    const current = listWindows().find((item) => item.id === id) ?? win;
+    return getRelativeCursorPosition(current);
   });
   ipcMain.handle(
     'text:debug',
@@ -180,12 +180,17 @@ app.whenReady().then(() => {
         throw new Error('Tolerance must be between 0 and 255');
       const focused =
         validatedRegion.relativeTo === 'screen' ? win : await focusSelectedWindow(win);
-      const passed = containsColor(await captureRegion(focused, validatedRegion), color, tolerance);
+      const result = analyzeColor(await captureRegion(focused, validatedRegion), color, tolerance);
       return {
-        passed,
-        reason: passed
-          ? `The selected region contains ${color} within tolerance ${tolerance}.`
-          : `The selected region does not contain ${color} within tolerance ${tolerance}.`,
+        passed: result.passed,
+        matchedPixels: result.matchedPixels,
+        totalPixels: result.totalPixels,
+        requiredPixels: result.requiredPixels,
+        closestColor: result.closestColor,
+        bestDistance: result.bestDistance,
+        reason: result.passed
+          ? `Found ${result.matchedPixels} matching pixels for ${color}; at least ${result.requiredPixels} are required.`
+          : `Only ${result.matchedPixels} matching pixels for ${color}; at least ${result.requiredPixels} are required. Closest sampled color was ${result.closestColor} at distance ${result.bestDistance.toFixed(1)}.`,
       };
     },
   );

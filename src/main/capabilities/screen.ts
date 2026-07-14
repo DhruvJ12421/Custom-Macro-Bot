@@ -37,20 +37,53 @@ export async function captureRegion(window: WindowInfo, region: DetectionRegion)
   return image.crop(crop(window, region)).toPNG();
 }
 
-export function containsColor(png: Buffer, hex: string, tolerance: number): boolean {
+export type ColorMatchResult = {
+  passed: boolean;
+  matchedPixels: number;
+  totalPixels: number;
+  requiredPixels: number;
+  bestDistance: number;
+  closestColor: string;
+};
+
+function toHexChannel(value: number) {
+  return value.toString(16).padStart(2, '0');
+}
+
+export function analyzeColor(png: Buffer, hex: string, tolerance: number): ColorMatchResult {
   const image = nativeImage.createFromBuffer(png);
   const bitmap = image.toBitmap();
   const [r, g, b] = [hex.slice(1, 3), hex.slice(3, 5), hex.slice(5, 7)].map((x) =>
     Number.parseInt(x!, 16),
   );
-  for (let i = 0; i < bitmap.length; i += 4)
-    if (
-      Math.abs(bitmap[i + 2]! - r!) <= tolerance &&
-      Math.abs(bitmap[i + 1]! - g!) <= tolerance &&
-      Math.abs(bitmap[i]! - b!) <= tolerance
-    )
-      return true;
-  return false;
+  let matchedPixels = 0;
+  let bestDistance = Number.POSITIVE_INFINITY;
+  let closestColor = '#000000';
+  for (let i = 0; i < bitmap.length; i += 4) {
+    const pixelB = bitmap[i]!;
+    const pixelG = bitmap[i + 1]!;
+    const pixelR = bitmap[i + 2]!;
+    const distance = Math.hypot(pixelR - r!, pixelG - g!, pixelB - b!);
+    if (distance < bestDistance) {
+      bestDistance = distance;
+      closestColor = `#${toHexChannel(pixelR)}${toHexChannel(pixelG)}${toHexChannel(pixelB)}`;
+    }
+    if (distance <= tolerance) matchedPixels++;
+  }
+  const totalPixels = bitmap.length / 4;
+  const requiredPixels = Math.max(8, Math.ceil(totalPixels * 0.001));
+  return {
+    passed: matchedPixels >= requiredPixels,
+    matchedPixels,
+    totalPixels,
+    requiredPixels,
+    bestDistance,
+    closestColor,
+  };
+}
+
+export function containsColor(png: Buffer, hex: string, tolerance: number): boolean {
+  return analyzeColor(png, hex, tolerance).passed;
 }
 
 export async function containsText(
